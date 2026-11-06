@@ -149,6 +149,7 @@ function translate_delivery_method(string $value): string
 {
     return [
         'courier' => 'Курьерская доставка',
+        'freight' => 'Грузовая доставка',
         'pickup' => 'Самовывоз',
     ][$value] ?? $value;
 }

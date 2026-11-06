@@ -1,7 +1,6 @@
 <?php
 
 $router->get('/', [AdminDashboardController::class, 'index']);
-$router->get('/training', [AdminTrainingController::class, 'index']);
 
 $router->get('/categories', [AdminCategoryController::class, 'index']);
 $router->get('/categories/create', [AdminCategoryController::class, 'create']);

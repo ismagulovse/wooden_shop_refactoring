@@ -66,6 +66,7 @@
             </div>
         </div>
 
+        <?php require ROOT_PATH . '/views/partials/order-charges.php'; ?>
         <div class="admin-actions-row">
             <?php if (!$order['deleted_at']): ?>
                 <form action="/admin/orders/<?= (int)$order['id'] ?>/delete" method="post" class="inline-form">

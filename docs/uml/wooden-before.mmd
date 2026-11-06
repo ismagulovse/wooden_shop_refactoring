@@ -26,7 +26,6 @@ classDiagram
         class AdminCategoryController["Управление категориями"]
         class AdminOrderController["Управление заказами"]
         class AdminUserController["Управление пользователями"]
-        class AdminTrainingController["Учебная страница"]
     }
 
     namespace Models {
@@ -38,8 +37,8 @@ classDiagram
         class Favorite["Избранное"]
     }
 
-    namespace Training {
-        class QuoteComparison["Сравнение расчётов"]
+    namespace Pricing {
+        class OrderPricing["Стоимость заказа"]
     }
 
     namespace Delivery {
@@ -91,7 +90,6 @@ classDiagram
     AdminBaseController <|-- AdminCategoryController
     AdminBaseController <|-- AdminOrderController
     AdminBaseController <|-- AdminUserController
-    AdminBaseController <|-- AdminTrainingController
     BaseModel <|-- User
     BaseModel <|-- Product
     BaseModel <|-- Category
@@ -118,6 +116,9 @@ classDiagram
     CheckoutController ..> Cart
     CheckoutController ..> User
     CheckoutController ..> Order
+    CheckoutController ..> OrderPricing
+    Order ..> OrderPricing
+    Order ..> Cart
     AdminProductController ..> Product
     AdminProductController ..> Category
     AdminCategoryController ..> Category
@@ -125,19 +126,17 @@ classDiagram
     AdminUserController ..> User
     AdminUserController ..> PDO
     AdminDashboardController ..> PDO
-    AdminTrainingController ..> QuoteComparison
-    QuoteComparison ..> CourierDelivery
-    QuoteComparison ..> FreightDelivery
-    QuoteComparison ..> ProtectivePackaging
-    QuoteComparison ..> CratePackaging
-    QuoteComparison ..> WorkshopAssembly
-    QuoteComparison ..> OnSiteAssembly
-    QuoteComparison ..> LoyaltyDiscount
-    QuoteComparison ..> BundleDiscount
-    QuoteComparison ..> ExtendedWarranty
-    QuoteComparison ..> FixedWarranty
-    QuoteComparison ..> WeightRecycling
-    QuoteComparison ..> ItemRecycling
+    OrderPricing ..> CourierDelivery
+    OrderPricing ..> FreightDelivery
+    OrderPricing ..> ProtectivePackaging
+    OrderPricing ..> CratePackaging
+    OrderPricing ..> WorkshopAssembly
+    OrderPricing ..> OnSiteAssembly
+    OrderPricing ..> LoyaltyDiscount
+    OrderPricing ..> BundleDiscount
+    OrderPricing ..> ExtendedWarranty
+    OrderPricing ..> FixedWarranty
+    OrderPricing ..> WeightRecycling
+    OrderPricing ..> ItemRecycling
 
-    note for BaseModel "Модели работают с таблицами через SQL.\nСвязи таблиц не являются наследованием классов."
-    note for QuoteComparison "Учебные классы находятся в PHP-пространстве WoodenTraining.\nГруппы на схеме служат только для удобства чтения."
+

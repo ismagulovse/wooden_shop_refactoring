@@ -21,6 +21,7 @@
 
     document.querySelectorAll('form[data-validate]').forEach((form) => {
         form.addEventListener('submit', (event) => {
+            if (event.submitter && event.submitter.formNoValidate) return;
             const invalid = form.querySelector(':invalid');
             if (invalid) {
                 event.preventDefault();

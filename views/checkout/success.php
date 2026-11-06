@@ -69,10 +69,11 @@
             </table>
         </div>
 
+        <?php require ROOT_PATH . '/views/partials/order-charges.php'; ?>
         <footer class="receipt-total-row">
             <div>
                 <span>Итого к оплате</span>
-                <strong><?= money_format_local((float)$order['total_amount']) ?></strong>
+                <strong><?= e(number_format((float)$order['total_amount'], 2, ',', ' ')) ?> ₽</strong>
             </div>
             <div class="card-actions">
                 <button type="button" id="downloadReceiptBtn" class="btn btn-light">Скачать чек (PNG)</button>

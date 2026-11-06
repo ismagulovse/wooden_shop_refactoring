@@ -11,7 +11,7 @@
 | Каталог | `CatalogController` |
 | Вход и регистрация | `AuthController` |
 | Личный кабинет | `ProfileController` |
-| Корзина — страницы | `CartController` |
+| Корзина — страницы | `CartController`|
 | Избранное — страницы | `FavoriteController` |
 | Оформление заказа | `CheckoutController` |
 | Страница ошибки | `ErrorController` |
@@ -21,26 +21,25 @@
 | Управление категориями | `AdminCategoryController` |
 | Управление заказами | `AdminOrderController` |
 | Управление пользователями | `AdminUserController` |
-| Учебная страница | `AdminTrainingController` |
 | Пользователь | `User` |
 | Товар | `Product` |
 | Категория | `Category` |
 | Заказ | `Order` |
 | Корзина | `Cart` |
 | Избранное | `Favorite` |
-| Сравнение расчётов | `WoodenTraining\\QuoteComparison` |
-| Курьер | `WoodenTraining\\CourierDelivery` |
-| Перевозчик | `WoodenTraining\\FreightDelivery` |
-| Защитная упаковка | `WoodenTraining\\ProtectivePackaging` |
-| Короба | `WoodenTraining\\CratePackaging` |
-| Сборка в мастерской | `WoodenTraining\\WorkshopAssembly` |
-| Выездная сборка | `WoodenTraining\\OnSiteAssembly` |
-| Скидка за сумму | `WoodenTraining\\LoyaltyDiscount` |
-| Скидка за комплект | `WoodenTraining\\BundleDiscount` |
-| Гарантия от стоимости | `WoodenTraining\\ExtendedWarranty` |
-| Фиксированная гарантия | `WoodenTraining\\FixedWarranty` |
-| Вывоз по весу | `WoodenTraining\\WeightRecycling` |
-| Вывоз по количеству | `WoodenTraining\\ItemRecycling` |
+| Стоимость заказа | `Wooden\\OrderPricing` |
+| Курьер | `Wooden\\CourierDelivery` |
+| Перевозчик | `Wooden\\FreightDelivery` |
+| Защитная упаковка | `Wooden\\ProtectivePackaging` |
+| Короба | `Wooden\\CratePackaging` |
+| Сборка в мастерской | `Wooden\\WorkshopAssembly` |
+| Выездная сборка | `Wooden\\OnSiteAssembly` |
+| Скидка за сумму | `Wooden\\LoyaltyDiscount` |
+| Скидка за комплект | `Wooden\\BundleDiscount` |
+| Гарантия от стоимости | `Wooden\\ExtendedWarranty` |
+| Фиксированная гарантия | `Wooden\\FixedWarranty` |
+| Вывоз по весу | `Wooden\\WeightRecycling` |
+| Вывоз по количеству | `Wooden\\ItemRecycling` |
 
 
 

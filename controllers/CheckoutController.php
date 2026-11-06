@@ -1,10 +1,18 @@
 <?php
 
+require_once __DIR__ . '/../services/OrderPricing.php';
+
 class CheckoutController extends BaseController
 {
     public function index(): void
     {
         require_auth();
+
+        if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
+            verify_csrf();
+            $_SESSION['checkout_form'] = array_filter($_POST, static fn($v) => is_string($v));
+            unset($_SESSION['checkout_form']['_csrf']);
+        }
 
         $cart = new Cart();
         $items = $cart->items((int) user_id());
@@ -14,6 +22,13 @@ class CheckoutController extends BaseController
         }
 
         $user = (new User())->findById((int) user_id());
+        $form = $_SESSION['checkout_form'] ?? [];
+        try {
+            $quote = (new \Wooden\OrderPricing())->calculate($items, $form);
+        } catch (DomainException $e) {
+            flash('main', $e->getMessage(), 'error');
+            $quote = (new \Wooden\OrderPricing())->calculate($items, []);
+        }
         $now = new DateTimeImmutable('now');
         $delivery = $now->modify('+7 days');
         $orderDateText = $now->format('d') . '.' . $now->format('m') . '.' . $now->format('Y') . ' ' . $now->format('H') . ':' . $now->format('i');
@@ -22,7 +37,9 @@ class CheckoutController extends BaseController
         $this->render('checkout/index', [
             'title' => 'Оформление заказа',
             'items' => $items,
-            'total' => $cart->total((int) user_id()),
+            'total' => $quote['total'] / 100,
+            'quote' => $quote,
+            'form' => $form,
             'user' => $user,
             'previewOrderDateText' => $orderDateText,
             'previewDeliveryDateText' => $deliveryDateText,
@@ -45,17 +62,20 @@ class CheckoutController extends BaseController
         verify_csrf();
         require_auth();
 
+        $_SESSION['checkout_form'] = array_filter($_POST, static fn($v) => is_string($v));
+        unset($_SESSION['checkout_form']['_csrf']);
+        $posted = $_SESSION['checkout_form'];
         $payload = [
-            'customer_name' => trim($_POST['customer_name'] ?? ''),
-            'customer_phone' => trim($_POST['customer_phone'] ?? ''),
-            'customer_email' => trim($_POST['customer_email'] ?? ''),
-            'delivery_address' => trim($_POST['delivery_address'] ?? ''),
-            'comment' => trim($_POST['comment'] ?? ''),
-            'payment_method' => trim($_POST['payment_method'] ?? ''),
-            'delivery_method' => trim($_POST['delivery_method'] ?? ''),
+            'customer_name' => trim($posted['customer_name'] ?? ''),
+            'customer_phone' => trim($posted['customer_phone'] ?? ''),
+            'customer_email' => trim($posted['customer_email'] ?? ''),
+            'delivery_address' => trim($posted['delivery_address'] ?? ''),
+            'comment' => trim($posted['comment'] ?? ''),
+            'payment_method' => trim($posted['payment_method'] ?? ''),
+            'delivery_method' => trim($posted['delivery_method'] ?? ''),
         ];
 
-        if ($payload['customer_name'] === '' || $payload['delivery_address'] === '' || !filter_var($payload['customer_email'], FILTER_VALIDATE_EMAIL)) {
+        if ($payload['customer_name'] === '' || $payload['customer_phone'] === '' || $payload['delivery_address'] === '' || !filter_var($payload['customer_email'], FILTER_VALIDATE_EMAIL) || !in_array($payload['payment_method'], ['card', 'cash'], true)) {
             flash('main', 'Проверьте корректность данных для заказа.', 'error');
             redirect('/checkout');
         }
@@ -67,17 +87,19 @@ class CheckoutController extends BaseController
             redirect('/cart');
         }
 
-        $total = $cart->total((int) user_id());
         $orderModel = new Order();
 
         try {
-            $orderId = $orderModel->createFromCart((int) user_id(), $payload, $items, $total);
-            $cart->clear((int) user_id());
+            $orderId = $orderModel->createFromCart((int) user_id(), $payload, $_POST);
+            unset($_SESSION['checkout_form']);
             flash('main', 'Заказ успешно оформлен.');
             redirect('/checkout/success/' . $orderId);
+        } catch (DomainException $e) {
+            flash('main', $e->getMessage(), 'error');
+            redirect('/checkout');
         } catch (Throwable $e) {
-            $message = trim($e->getMessage());
-            flash('main', $message !== '' ? $message : 'Не удалось оформить заказ.', 'error');
+            error_log($e->getMessage());
+            flash('main', 'Не удалось оформить заказ. Проверьте наличие товаров и применение миграции услуг.', 'error');
             redirect('/checkout');
         }
     }

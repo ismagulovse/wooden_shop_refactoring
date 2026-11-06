@@ -2,6 +2,7 @@
 USE wooden_shop;
 
 SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS order_charges;
 DROP TABLE IF EXISTS order_items;
 DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS cart_items;
@@ -134,6 +135,16 @@ CREATE TABLE order_items (
     created_at DATETIME NOT NULL,
     CONSTRAINT fk_order_items_order FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
     CONSTRAINT fk_order_items_product FOREIGN KEY (product_id) REFERENCES products(id)
+) ENGINE=InnoDB;
+
+CREATE TABLE order_charges (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    order_id INT UNSIGNED NOT NULL,
+    code VARCHAR(40) NOT NULL,
+    label VARCHAR(255) NOT NULL,
+    amount DECIMAL(12,2) NOT NULL,
+    CONSTRAINT fk_order_charges_order FOREIGN KEY (order_id) REFERENCES orders(id),
+    INDEX idx_order_charges_order (order_id)
 ) ENGINE=InnoDB;
 
 INSERT INTO users (first_name, last_name, email, phone, password_hash, role, status, created_at, updated_at, deleted_at)

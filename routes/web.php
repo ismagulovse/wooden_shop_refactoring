@@ -28,6 +28,7 @@ $router->post('/cart/remove', [CartController::class, 'remove']);
 $router->post('/cart/clear', [CartController::class, 'clear']);
 
 $router->get('/checkout', [CheckoutController::class, 'index']);
+$router->post('/checkout/preview', [CheckoutController::class, 'index']);
 $router->post('/checkout/place', [CheckoutController::class, 'place']);
 $router->get('/checkout/success/{id}', [CheckoutController::class, 'success']);
 

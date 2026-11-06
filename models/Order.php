@@ -1,13 +1,38 @@
 <?php
+require_once __DIR__ . '/../services/OrderPricing.php';
 class Order extends BaseModel
 {
     public const STATUSES = ['new', 'processing', 'confirmed', 'shipped', 'delivered', 'cancelled'];
 
-    public function createFromCart(int $userId, array $payload, array $items, float $total): int
+    public function createFromCart(int $userId, array $payload, array $options): int
     {
         $this->db->beginTransaction();
 
         try {
+            // Блокировка корзины сериализует повторное оформление одним пользователем.
+            $lock = $this->db->prepare('SELECT id FROM carts WHERE user_id=:uid FOR UPDATE');
+            $lock->execute(['uid' => $userId]);
+            if (!$lock->fetchColumn()) {
+                throw new DomainException('Корзина пуста.');
+            }
+            $items = (new Cart())->items($userId);
+            $productLock = $this->db->prepare('SELECT name, price, stock FROM products WHERE id=:id AND deleted_at IS NULL AND is_active=1 FOR UPDATE');
+            usort($items, static fn($a, $b) => $a['product_id'] <=> $b['product_id']);
+            foreach ($items as &$item) {
+                $productLock->execute(['id' => $item['product_id']]);
+                $fresh = $productLock->fetch();
+                if (!$fresh || (int)$fresh['stock'] < (int)$item['quantity']) {
+                    throw new DomainException('Недостаточно товара на складе.');
+                }
+                $item['price'] = $fresh['price'];
+                $item['name'] = $fresh['name'];
+            }
+            unset($item);
+            $quote = (new \Wooden\OrderPricing())->calculate($items, $options);
+            $fingerprint = hash('sha256', json_encode($quote, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
+            if (!is_string($options['quote_fingerprint'] ?? null) || !hash_equals($fingerprint, $options['quote_fingerprint'])) {
+                throw new DomainException('Состав или стоимость заказа изменились. Проверьте обновлённый чек и подтвердите заказ ещё раз.');
+            }
             $this->decreaseStockByItems($items);
 
             $stmt = $this->db->prepare('INSERT INTO orders (user_id,status,customer_name,customer_phone,customer_email,delivery_address,comment,payment_method,delivery_method,total_amount,created_at,updated_at) VALUES (:user_id,:status,:customer_name,:customer_phone,:customer_email,:delivery_address,:comment,:payment_method,:delivery_method,:total_amount,NOW(),NOW())');
@@ -20,8 +45,8 @@ class Order extends BaseModel
                 'delivery_address' => $payload['delivery_address'],
                 'comment' => $payload['comment'],
                 'payment_method' => $payload['payment_method'],
-                'delivery_method' => $payload['delivery_method'],
-                'total_amount' => $total,
+                'delivery_method' => $quote['options']['delivery_method'],
+                'total_amount' => number_format($quote['total'] / 100, 2, '.', ''),
             ]);
 
             $orderId = (int) $this->db->lastInsertId();
@@ -39,6 +64,11 @@ class Order extends BaseModel
                 ]);
             }
 
+            $charge = $this->db->prepare('INSERT INTO order_charges (order_id, code, label, amount) VALUES (:order_id,:code,:label,:amount)');
+            foreach ($quote['lines'] as $line) {
+                $charge->execute(['order_id' => $orderId, 'code' => $line['code'], 'label' => $line['label'], 'amount' => number_format($line['amount'] / 100, 2, '.', '')]);
+            }
+            (new Cart())->clear($userId);
             $this->db->commit();
             return $orderId;
         } catch (Throwable $e) {
@@ -77,6 +107,9 @@ class Order extends BaseModel
         $items = $this->db->prepare('SELECT * FROM order_items WHERE order_id=:id ORDER BY id');
         $items->execute(['id' => $id]);
         $order['items'] = $items->fetchAll();
+        $charges = $this->db->prepare('SELECT code, label, amount FROM order_charges WHERE order_id=:id ORDER BY id');
+        $charges->execute(['id' => $id]);
+        $order['charges'] = $charges->fetchAll();
         return $order;
     }
 
@@ -186,7 +219,7 @@ class Order extends BaseModel
             WHERE id = :product_id
               AND deleted_at IS NULL
               AND is_active = 1
-              AND stock >= :qty
+              AND stock >= :required_qty
         ');
 
         foreach ($items as $item) {
@@ -199,6 +232,7 @@ class Order extends BaseModel
 
             $stmt->execute([
                 'qty' => $qty,
+                'required_qty' => $qty,
                 'product_id' => $productId,
             ]);
 

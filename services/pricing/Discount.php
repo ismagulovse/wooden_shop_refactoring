@@ -1,5 +1,5 @@
 <?php
-namespace WoodenTraining;
+namespace Wooden;
 
 final class LoyaltyDiscount
 {

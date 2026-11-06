@@ -21,7 +21,6 @@
             <a href="/admin/categories">Категории</a>
             <a href="/admin/orders">Заказы</a>
             <a href="/admin/users">Пользователи</a>
-            <a href="/admin/training">Учебные расчёты</a>
             <a href="/">На сайт</a>
         </nav>
     </aside>
