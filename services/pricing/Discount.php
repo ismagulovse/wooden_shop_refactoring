@@ -17,7 +17,7 @@ final class LoyaltyDiscount
 
     private function tierDiscount(): int
     {
-        // Повышенная скидка действует только при сумме строго больше 100 000 рублей.
+        // Повышенная скидка действует при сумме от 100 000 рублей.
         $percent = $this->eligibleAmount >= 10000000 ? 7 : 3;
         // Дробная копейка скидки отбрасывается, чтобы результат оставался целым числом копеек.
         return intdiv($this->eligibleAmount * $percent, 100);

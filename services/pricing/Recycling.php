@@ -17,7 +17,6 @@ final class WeightRecycling
 
     private function disposalCharge(): int
     {
-        // Возвращаем результат.
         return $this->billableKg * 1500;
     }
 }
