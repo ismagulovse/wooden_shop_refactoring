@@ -61,14 +61,7 @@ class AuthController extends BaseController
         ]);
 
         $user = $userModel->findById($userId);
-        $_SESSION['user'] = [
-            'id' => $user['id'],
-            'first_name' => $user['first_name'],
-            'last_name' => $user['last_name'],
-            'email' => $user['email'],
-            'role' => $user['role'],
-            'status' => $user['status'],
-        ];
+        $this->setUserSession($user);
 
         flash('main', 'Регистрация успешна. Добро пожаловать в Wooden!');
         redirect('/profile');
@@ -108,14 +101,7 @@ class AuthController extends BaseController
             redirect('/login');
         }
 
-        $_SESSION['user'] = [
-            'id' => $user['id'],
-            'first_name' => $user['first_name'],
-            'last_name' => $user['last_name'],
-            'email' => $user['email'],
-            'role' => $user['role'],
-            'status' => $user['status'],
-        ];
+        $this->setUserSession($user);
 
         flash('main', 'Вы успешно вошли.');
         redirect('/profile');
@@ -127,6 +113,18 @@ class AuthController extends BaseController
         unset($_SESSION['user']);
         flash('main', 'Вы вышли из аккаунта.');
         redirect('/');
+    }
+
+    private function setUserSession(array $user): void
+    {
+        $_SESSION['user'] = [
+            'id' => $user['id'],
+            'first_name' => $user['first_name'],
+            'last_name' => $user['last_name'],
+            'email' => $user['email'],
+            'role' => $user['role'],
+            'status' => $user['status'],
+        ];
     }
 }
 
