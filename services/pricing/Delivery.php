@@ -26,7 +26,6 @@ final class FreightDelivery
 {
     public function estimate(array $shipment): array
     {
-        // Стоимость перевозки возвращается в копейках.
         return ['rubles' => 900 + (int) ceil($shipment['weight_kg'] / 10) * 120];
     }
 }

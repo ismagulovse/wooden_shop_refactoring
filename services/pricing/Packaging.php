@@ -7,7 +7,6 @@ final class ProtectivePackaging
 
     public function price(int $units): int
     {
-        // Записываем количество в поле currentUnits.
         $this->currentUnits = $units;
         try {
             return $this->materials() + $this->labour();

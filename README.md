@@ -14,7 +14,7 @@
 
 | № issue | Исправление | Что изменилось |
 | --- | --- | --- |
-| — | — | — |
+| [1](https://github.com/ismagulovse/wooden_shop_refactoring/issues/1) | [Плохие комментарии](https://github.com/ismagulovse/wooden_shop_refactoring/issues/1) | Исправлены пять комментариев в расчётах услуг. |
 
 
 
