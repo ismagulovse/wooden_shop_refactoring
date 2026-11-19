@@ -11,24 +11,6 @@ class ProfileController extends BaseController
         $orders = (new Order())->listByUser((int) user_id());
         $favoriteCount = (new Favorite())->count((int) user_id());
 
-        $now = new DateTimeImmutable('now');
-        foreach ($orders as &$order) {
-            $createdAt = new DateTimeImmutable($order['created_at']);
-            $deadline = $createdAt->modify('+15 minutes');
-            $deadlineTimestamp = $deadline->getTimestamp();
-            $currentTimestamp = $now->getTimestamp();
-            $difference = $deadlineTimestamp - $currentTimestamp;
-            if ($difference > 0) {
-                $remaining = $difference;
-            } else {
-                $remaining = 0;
-            }
-
-            $order['cancel_remaining_seconds'] = $remaining;
-            $order['can_cancel'] = $order['status'] === 'new' && $remaining > 0;
-        }
-        unset($order);
-
         $this->render('profile/index', [
             'title' => 'Личный кабинет',
             'user' => $user,

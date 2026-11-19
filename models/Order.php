@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../services/OrderPricing.php';
+require_once __DIR__ . '/../services/OrderCancellationRule.php';
 class Order extends BaseModel
 {
     public const STATUSES = ['new', 'processing', 'confirmed', 'shipped', 'delivered', 'cancelled'];
@@ -79,9 +80,17 @@ class Order extends BaseModel
 
     public function listByUser(int $userId): array
     {
-        $stmt = $this->db->prepare('SELECT * FROM orders WHERE user_id=:uid AND deleted_at IS NULL ORDER BY created_at DESC');
+        $stmt = $this->db->prepare('SELECT *, NOW() AS database_time FROM orders WHERE user_id=:uid AND deleted_at IS NULL ORDER BY created_at DESC');
         $stmt->execute(['uid' => $userId]);
-        return $stmt->fetchAll();
+        $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $rule = new OrderCancellationRule();
+
+        foreach ($orders as $i => $order) {
+            $orders[$i]['can_cancel'] = $rule->canCancel($order, $order['database_time']);
+            $orders[$i]['cancel_remaining_seconds'] = $rule->getRemainingSeconds($order['created_at'], $order['database_time']);
+        }
+
+        return $orders;
     }
 
     public function all(bool $withDeleted = true): array
@@ -174,25 +183,27 @@ class Order extends BaseModel
     {
         $this->db->beginTransaction();
         try {
+            // Блокируем заказ до конца отмены, чтобы его не изменили одновременно.
             $stmt = $this->db->prepare("
-                UPDATE orders
-                SET status = 'cancelled', updated_at = NOW()
+                SELECT *, NOW() AS database_time FROM orders
                 WHERE id = :id
                   AND user_id = :user_id
-                  AND deleted_at IS NULL
-                  AND status = 'new'
-                  AND TIMESTAMPDIFF(MINUTE, created_at, NOW()) <= 15
+                FOR UPDATE
             ");
             $stmt->execute([
                 'id' => $orderId,
                 'user_id' => $userId,
             ]);
 
-            if ($stmt->rowCount() < 1) {
+            $order = $stmt->fetch(PDO::FETCH_ASSOC);
+            $rule = new OrderCancellationRule();
+            if (!$order || !$rule->canCancel($order, $order['database_time'])) {
                 $this->db->rollBack();
                 return false;
             }
 
+            $stmt = $this->db->prepare("UPDATE orders SET status='cancelled', updated_at=NOW() WHERE id=:id");
+            $stmt->execute(['id' => $orderId]);
             $this->increaseStockByItems($this->orderItemsForStock($orderId));
             $this->db->commit();
             return true;
