@@ -3,11 +3,13 @@ namespace Wooden;
 
 final class WeightRecycling
 {
+    private const INCLUDED_KG = 20;
+
     private ?int $billableKg = null;
 
     public function fee(int $weightKg): int
     {
-        $this->billableKg = max(0, $weightKg - 20);
+        $this->billableKg = max(0, $weightKg - self::INCLUDED_KG);
         try {
             return 50000 + $this->disposalCharge();
         } finally {
