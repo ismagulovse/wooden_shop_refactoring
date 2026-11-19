@@ -41,8 +41,13 @@ class CheckoutController extends BaseController
             'quote' => $quote,
             'form' => $form,
             'user' => $user,
-            'previewOrderDateText' => $orderDateText,
-            'previewDeliveryDateText' => $deliveryDateText,
+            'orderDateText' => $orderDateText,
+            'deliveryDateText' => $deliveryDateText,
+            'customer' => [
+                'name' => $form['customer_name'] ?? ($user['first_name'] . ' ' . $user['last_name']),
+                'phone' => $form['customer_phone'] ?? $user['phone'],
+                'email' => $form['customer_email'] ?? $user['email'],
+            ],
             'supplier' => [
                 'name' => 'Wooden Shop',
                 'contact' => '+7 (900) 000-00-00',
@@ -125,6 +130,11 @@ class CheckoutController extends BaseController
             'order' => $order,
             'orderDateText' => $orderDateText,
             'deliveryDateText' => $deliveryDateText,
+            'customer' => [
+                'name' => $order['customer_name'],
+                'phone' => $order['customer_phone'],
+                'email' => $order['customer_email'],
+            ],
             'supplier' => [
                 'name' => 'Wooden Shop',
                 'contact' => '+7 (900) 000-00-00',

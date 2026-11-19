@@ -6,37 +6,19 @@
                 <h1>Заказ #<?= (int)$order['id'] ?></h1>
                 <p class="receipt-meta">Статус: <?= e(translate_order_status($order['status'])) ?></p>
             </div>
-            <div class="receipt-dates">
-                <div>
-                    <span>Время заказа</span>
-                    <strong><?= e($orderDateText) ?></strong>
-                </div>
-                <div>
-                    <span>Ожидаемая доставка</span>
-                    <strong><?= e($deliveryDateText) ?></strong>
-                </div>
-            </div>
+            <?php require ROOT_PATH . '/views/partials/receipt-dates.php'; ?>
         </header>
 
         <section class="receipt-info-grid">
             <div class="receipt-block">
-                <h3>Заказчик</h3>
-                <p><strong><?= e($order['customer_name']) ?></strong></p>
-                <p><?= e($order['customer_phone']) ?></p>
-                <p><?= e($order['customer_email']) ?></p>
+                <?php require ROOT_PATH . '/views/partials/receipt-customer.php'; ?>
                 <p><?= e($order['delivery_address']) ?></p>
                 <?php if (!empty($order['comment'])): ?>
                     <p class="muted">Комментарий: <?= e($order['comment']) ?></p>
                 <?php endif; ?>
             </div>
 
-            <div class="receipt-block">
-                <h3>Поставщик</h3>
-                <p><strong><?= e($supplier['name']) ?></strong></p>
-                <p><?= e($supplier['contact']) ?></p>
-                <p><?= e($supplier['email']) ?></p>
-                <p><?= e($supplier['address']) ?></p>
-            </div>
+            <?php require ROOT_PATH . '/views/partials/receipt-supplier.php'; ?>
 
             <div class="receipt-block">
                 <h3>Оплата и доставка</h3>

@@ -47,32 +47,14 @@
                 <h2>Ваш заказ</h2>
                 <p class="receipt-meta">Финальный чек будет сформирован после подтверждения</p>
             </div>
-            <div class="receipt-dates">
-                <div>
-                    <span>Время заказа</span>
-                    <strong><?= e($previewOrderDateText) ?></strong>
-                </div>
-                <div>
-                    <span>Ожидаемая доставка</span>
-                    <strong><?= e($previewDeliveryDateText) ?></strong>
-                </div>
-            </div>
+            <?php require ROOT_PATH . '/views/partials/receipt-dates.php'; ?>
         </header>
 
         <section class="receipt-info-grid">
             <div class="receipt-block">
-                <h3>Заказчик</h3>
-                <p><strong><?= e($form['customer_name'] ?? ($user['first_name'] . ' ' . $user['last_name'])) ?></strong></p>
-                <p><?= e($form['customer_phone'] ?? $user['phone']) ?></p>
-                <p><?= e($form['customer_email'] ?? $user['email']) ?></p>
+                <?php require ROOT_PATH . '/views/partials/receipt-customer.php'; ?>
             </div>
-            <div class="receipt-block">
-                <h3>Поставщик</h3>
-                <p><strong><?= e($supplier['name']) ?></strong></p>
-                <p><?= e($supplier['contact']) ?></p>
-                <p><?= e($supplier['email']) ?></p>
-                <p><?= e($supplier['address']) ?></p>
-            </div>
+            <?php require ROOT_PATH . '/views/partials/receipt-supplier.php'; ?>
             <div class="receipt-block">
                 <h3>Позиции заказа</h3>
                 <?php foreach ($items as $item): ?>
