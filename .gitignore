@@ -25,6 +25,7 @@
 /.tmp_*
 /tmp/
 /cache/
+/docs/issues/
 
 # Editors and operating systems
 /.idea/
