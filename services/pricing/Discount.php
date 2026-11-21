@@ -26,9 +26,11 @@ final class LoyaltyDiscount
 
 final class BundleDiscount
 {
+    private const MIN_UNITS = 3;
+
     public function apply(array $basket): array
     {
-        $saving = $basket['units'] >= 3 ? intdiv($basket['subtotal_kopecks'] * 5, 100) : 0;
+        $saving = $basket['units'] >= self::MIN_UNITS ? intdiv($basket['subtotal_kopecks'] * 5, 100) : 0;
         return ['payable_kopecks' => $basket['subtotal_kopecks'] - $saving];
     }
 }
