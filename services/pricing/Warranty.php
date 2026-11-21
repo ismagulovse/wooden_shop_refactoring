@@ -3,6 +3,8 @@ namespace Wooden;
 
 final class ExtendedWarranty
 {
+    private const ANNUAL_PERCENT = 2;
+
     private ?int $coveredValue = null;
 
     public function premium(int $subtotalKopecks, int $months): int
@@ -18,7 +20,7 @@ final class ExtendedWarranty
 
     private function annualPremium(): int
     {
-        return intdiv($this->coveredValue * 2, 100);
+        return intdiv($this->coveredValue * self::ANNUAL_PERCENT, 100);
     }
 }
 
