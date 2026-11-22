@@ -69,7 +69,7 @@ final class OrderPricing
         if ($o['packaging'] === 'protective') {
             $add('packaging', 'Защитная упаковка: ' . $units . ' шт.', (new ProtectivePackaging())->price($units));
         } elseif ($o['packaging'] === 'crate') {
-            $quote = (new CratePackaging())->calculateCrates(['units' => $units]);
+            $quote = (new CratePackaging())->calculateCost(['units' => $units]);
             $add('packaging', 'Деревянные короба: ' . $units . ' предметов', $quote['amount_kopecks']);
         }
         if ($o['assembly'] === 'workshop') {
@@ -79,10 +79,10 @@ final class OrderPricing
             $add('assembly', 'Выездная сборка: ' . $units . ' шт., ' . $o['distance'] . ' км', $quote['rubles'] * 100);
         }
         // Скидки не суммируются: покупателю автоматически применяется большая.
-        $loyalty = (new LoyaltyDiscount())->discount($subtotal);
+        $orderAmountDiscount = (new OrderAmountDiscount())->discount($subtotal);
         $bundle = (new BundleDiscount())->apply(['units' => $units, 'subtotal_kopecks' => $subtotal]);
         $saving = $subtotal - $bundle['payable_kopecks'];
-        $add('discount', $saving > $loyalty ? 'Скидка за комплект' : 'Скидка на сумму покупки', -max($loyalty, $saving));
+        $add('discount', $saving > $orderAmountDiscount ? 'Скидка за комплект' : 'Скидка на сумму покупки', -max($orderAmountDiscount, $saving));
         if ($o['warranty'] === 'extended') {
             $add('warranty', 'Гарантия от стоимости: ' . $o['months'] . ' мес.', (new ExtendedWarranty())->premium($subtotal, $o['months']));
         } elseif ($o['warranty'] === 'fixed') {

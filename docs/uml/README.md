@@ -34,7 +34,7 @@
 | Короба | `Wooden\\CratePackaging` |
 | Сборка в мастерской | `Wooden\\WorkshopAssembly` |
 | Выездная сборка | `Wooden\\OnSiteAssembly` |
-| Скидка за сумму | `Wooden\\LoyaltyDiscount` |
+| Скидка за сумму | `Wooden\\OrderAmountDiscount` |
 | Скидка за комплект | `Wooden\\BundleDiscount` |
 | Гарантия от стоимости | `Wooden\\ExtendedWarranty` |
 | Фиксированная гарантия | `Wooden\\FixedWarranty` |

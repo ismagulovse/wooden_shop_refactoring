@@ -1,7 +1,7 @@
 <?php
 namespace Wooden;
 
-final class LoyaltyDiscount
+final class OrderAmountDiscount
 {
     private ?int $eligibleAmount = null;
 

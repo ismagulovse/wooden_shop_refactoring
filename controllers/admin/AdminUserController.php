@@ -23,7 +23,7 @@ class AdminUserController extends AdminBaseController
         $this->renderAdmin('admin/users/show', ['title' => 'Пользователь', 'user' => $user]);
     }
 
-    public function status(int $id): void
+    public function updateRoleAndStatus(int $id): void
     {
         verify_csrf();
 
