@@ -21,7 +21,7 @@ final class ProtectivePackaging
 
 final class CratePackaging
 {
-    public function calculateCrates(array $goods): array
+    public function calculateCost(array $goods): array
     {
         // Короб вмещает два предмета; неполный короб оплачивается целиком.
         return ['amount_kopecks' => (int) ceil($goods['units'] / 2) * 90000];

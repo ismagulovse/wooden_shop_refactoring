@@ -31,7 +31,7 @@ class Favorite extends BaseModel
         return (int) $stmt->fetchColumn();
     }
 
-    public function idsByUser(int $userId): array
+    public function productIdsByUser(int $userId): array
     {
         $stmt = $this->db->prepare('SELECT product_id FROM favorites WHERE user_id = :uid');
         $stmt->execute(['uid' => $userId]);

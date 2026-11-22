@@ -26,7 +26,7 @@ $router->post('/orders/{id}/restore', [AdminOrderController::class, 'restore']);
 
 $router->get('/users', [AdminUserController::class, 'index']);
 $router->get('/users/{id}', [AdminUserController::class, 'show']);
-$router->post('/users/{id}/status', [AdminUserController::class, 'status']);
+$router->post('/users/{id}/status', [AdminUserController::class, 'updateRoleAndStatus']);
 $router->post('/users/{id}/delete', [AdminUserController::class, 'delete']);
 $router->post('/users/{id}/restore', [AdminUserController::class, 'restore']);
 

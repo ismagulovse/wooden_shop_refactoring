@@ -2,7 +2,7 @@
 
 class Cart extends BaseModel
 {
-    private function cartId(int $userId): int
+    private function getOrCreateCartId(int $userId): int
     {
         $stmt = $this->db->prepare('SELECT id FROM carts WHERE user_id = :uid LIMIT 1');
         $stmt->execute(['uid' => $userId]);
@@ -18,7 +18,7 @@ class Cart extends BaseModel
 
     public function add(int $userId, int $productId, int $qty): void
     {
-        $cartId = $this->cartId($userId);
+        $cartId = $this->getOrCreateCartId($userId);
         $qty = max(1, $qty);
 
         $stmt = $this->db->prepare('SELECT id, quantity FROM cart_items WHERE cart_id=:cart_id AND product_id=:product_id LIMIT 1');
@@ -38,7 +38,7 @@ class Cart extends BaseModel
 
     public function items(int $userId): array
     {
-        $cartId = $this->cartId($userId);
+        $cartId = $this->getOrCreateCartId($userId);
 
         $stmt = $this->db->prepare('SELECT ci.id, ci.quantity, p.id AS product_id, p.name, p.price, p.stock, (SELECT image_path FROM product_images WHERE product_id=p.id AND deleted_at IS NULL ORDER BY sort_order LIMIT 1) as image FROM cart_items ci INNER JOIN products p ON p.id = ci.product_id WHERE ci.cart_id = :cart_id AND p.deleted_at IS NULL AND p.is_active=1 ORDER BY ci.created_at DESC');
         $stmt->execute(['cart_id' => $cartId]);
@@ -47,7 +47,7 @@ class Cart extends BaseModel
 
     public function updateItem(int $userId, int $itemId, int $qty): void
     {
-        $cartId = $this->cartId($userId);
+        $cartId = $this->getOrCreateCartId($userId);
         $qty = max(1, $qty);
 
         $stmt = $this->db->prepare('UPDATE cart_items SET quantity=:q,updated_at=NOW() WHERE id=:id AND cart_id=:cart_id');
@@ -58,7 +58,7 @@ class Cart extends BaseModel
 
     public function removeItem(int $userId, int $itemId): void
     {
-        $cartId = $this->cartId($userId);
+        $cartId = $this->getOrCreateCartId($userId);
         $stmt = $this->db->prepare('DELETE FROM cart_items WHERE id=:id AND cart_id=:cart_id');
         $stmt->execute(['id' => $itemId, 'cart_id' => $cartId]);
         $this->touch($cartId);
@@ -66,7 +66,7 @@ class Cart extends BaseModel
 
     public function clear(int $userId): void
     {
-        $cartId = $this->cartId($userId);
+        $cartId = $this->getOrCreateCartId($userId);
         $stmt = $this->db->prepare('DELETE FROM cart_items WHERE cart_id=:cart_id');
         $stmt->execute(['cart_id' => $cartId]);
         $this->touch($cartId);

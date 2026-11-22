@@ -9,7 +9,7 @@ class HomeController extends BaseController
 
         $favoriteIds = [];
         if (is_logged_in()) {
-            $favoriteIds = (new Favorite())->idsByUser((int) user_id());
+            $favoriteIds = (new Favorite())->productIdsByUser((int) user_id());
         }
 
         $this->render('home/index', [
