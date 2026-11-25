@@ -3,29 +3,31 @@ namespace Wooden;
 
 final class WorkshopAssembly
 {
-    private ?int $minutesForOrder = null;
+    private const MINUTES_PER_UNIT = 45;
+    private const MIN_CHARGE_KOPECKS = 60000;
+    private const MINUTE_RATE_KOPECKS = 2000;
 
     public function calculate(int $units): int
     {
         // На сборку каждого предмета мебели закладывается 45 минут.
-        $this->minutesForOrder = $units * 45;
-        try {
-            return $this->workCharge();
-        } finally {
-            $this->minutesForOrder = null;
-        }
+        return $this->workCharge($units * self::MINUTES_PER_UNIT);
     }
 
-    private function workCharge(): int
+    private function workCharge(int $minutesForOrder): int
     {
-        return max(60000, $this->minutesForOrder * 2000);
+        return max(self::MIN_CHARGE_KOPECKS, $minutesForOrder * self::MINUTE_RATE_KOPECKS);
     }
 }
 
 final class OnSiteAssembly
 {
+    private const BASE_VISIT_RUBLES = 1000;
+    private const ITEM_RATE_RUBLES = 700;
+    private const INCLUDED_KM = 10;
+    private const EXTRA_KM_RATE_RUBLES = 20;
+
     public function visitPrice(int $itemCount, int $distanceKm): array
     {
-        return ['rubles' => 1000 + $itemCount * 700 + max(0, $distanceKm - 10) * 20];
+        return ['rubles' => self::BASE_VISIT_RUBLES + $itemCount * self::ITEM_RATE_RUBLES + max(0, $distanceKm - self::INCLUDED_KM) * self::EXTRA_KM_RATE_RUBLES];
     }
 }
